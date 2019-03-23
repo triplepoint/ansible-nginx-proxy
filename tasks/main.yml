@@ -1,0 +1,36 @@
+---
+- name: Assemble the set of key file volume mounts
+  set_fact: _proxy_key_volumes="{{ item.key_path }}:/etc/nginx/certs/{{ item.domain }}.key:ro"
+  with_items: "{{ nginx_proxy_ssl_files }}"
+  register: _proxy_key_volume_results
+
+- name: Pull the processed list out of the result object
+  set_fact: _proxy_key_volume_results_mapped="{{ _proxy_key_volume_results.results | map(attribute='ansible_facts._proxy_key_volumes') | list }}"
+
+- name: Assemble the set of cert file volume mounts
+  set_fact: _proxy_cert_volumes="{{ item.certificate_path }}:/etc/nginx/certs/{{ item.domain }}.crt:ro"
+  with_items: "{{ nginx_proxy_ssl_files }}"
+  register: _proxy_cert_volume_results
+
+- name: Pull the processed list out of the result object
+  set_fact: _proxy_cert_volume_results_mapped="{{ _proxy_cert_volume_results.results | map(attribute='ansible_facts._proxy_cert_volumes') | list }}"
+
+- name: Append any additional volume mounts
+  set_fact:
+    _nginx_proxy_volumes: "['/var/run/docker.sock:/tmp/docker.sock:ro'] + {{ _proxy_key_volume_results_mapped }} + {{ _proxy_cert_volume_results_mapped }}"
+
+- name: Ensure Docker-related python packages are present
+  pip: name=docker
+
+- name: Ensure nginx proxy container is started
+  docker_container:
+    name: nginx-proxy
+    image: "jwilder/nginx-proxy:{{ nginx_proxy_version }}"
+    state: started
+    restart_policy: always
+    published_ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    volumes: "{{ _nginx_proxy_volumes }}"
+    env:
+      DEFAULT_HOST="{{ nginx_proxy_default_host }}"

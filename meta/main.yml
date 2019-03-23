@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Jonathan Hanson
+  description: A deployment role for Jason Wilder's excellent nginx proxy container https://github.com/jwilder/nginx-proxy.
+  license: MIT
+  min_ansible_version: 2.4
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+  galaxy_tags:
+    - nginx
+    - proxy
+dependencies: []
