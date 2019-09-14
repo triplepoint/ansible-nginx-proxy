@@ -12,3 +12,8 @@ nginx_proxy_version: "0.7.0"
 
 # The host to assume, if nothing else fits
 nginx_proxy_default_host: ""
+
+# The name of the docker network to establish for this service.
+# This is the network to which the downstream proxied containers
+# should attach.
+nginx_proxy_network_name: "nginx_proxy"
