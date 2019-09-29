@@ -1,0 +1,5 @@
+---
+- name: restart nginx-proxy
+  docker_compose:
+    project_src: /opt/ansible-docker-compose/nginx-proxy
+    restarted: yes

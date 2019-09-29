@@ -5,6 +5,13 @@
       - docker
       - docker-compose
 
+- name: Ensure the Docker container image is up to date
+  docker_image:
+    name: jwilder/nginx-proxy
+    source: pull
+    tag: "{{ nginx_proxy_version }}"
+  notify: restart nginx-proxy
+
 - name: Assemble the set of key file volume mounts
   set_fact: _proxy_key_volumes="{{ item.key_path }}:/etc/nginx/certs/{{ item.domain }}.key:ro"
   with_items: "{{ nginx_proxy_ssl_files }}"
